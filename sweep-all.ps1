@@ -1,8 +1,12 @@
+### Setup
 $Password = ""
 $WalletName = ""
 $ColdWalletAddress = ""
 $apiUrl = "http://127.0.0.1:12973/"
+$apiKey = ''
+###
 
+$headers = @{'X-API-KEY' = $apiKey}
 
 ### UNLOCK
 $unlockUrl = $apiUrl + "wallets/" + $WalletName +"/" + "unlock"
@@ -12,7 +16,7 @@ $Form =
     password  = $Password
 }
 
-Invoke-WebRequest -Uri $unlockUrl -Method Post -Body ($Form|ConvertTo-Json) -ContentType "application/json" -UseBasicParsing
+Invoke-WebRequest -Uri $unlockUrl -Headers $headers -Method Post -Body ($Form|ConvertTo-Json) -ContentType "application/json" -UseBasicParsing 
 
 #######
 
@@ -22,7 +26,7 @@ $balencesUrl = $apiUrl + "wallets/" + $WalletName +"/" + "balances"
 
 Write-Output $balencesUrl
 
-$result = Invoke-WebRequest -Uri $balencesUrl -ContentType "application/json" -UseBasicParsing | ConvertFrom-Json
+$result = Invoke-WebRequest -Uri $balencesUrl -Headers $headers -ContentType "application/json" -UseBasicParsing | ConvertFrom-Json 
 
 
 ########
@@ -37,7 +41,7 @@ foreach ($i in $result.balances)
         address  = $i.address
     }
 
-    Invoke-WebRequest -Uri $changeActiveAddressUrl -Method Post -Body ($Form|ConvertTo-Json) -ContentType "application/json" -UseBasicParsing
+    Invoke-WebRequest -Uri $changeActiveAddressUrl -Headers $headers -Method Post -Body ($Form|ConvertTo-Json) -ContentType "application/json" -UseBasicParsing
 
 
     $sweepAllUrl = $apiUrl + "wallets/" + $WalletName +"/sweep-all"
@@ -46,5 +50,5 @@ foreach ($i in $result.balances)
         toAddress  = $ColdWalletAddress
     }
 
-    Invoke-WebRequest -Uri $sweepAllUrl -Method Post -Body ($Form|ConvertTo-Json) -ContentType "application/json" -UseBasicParsing
+    Invoke-WebRequest -Uri $sweepAllUrl -Headers $headers -Method Post -Body ($Form|ConvertTo-Json) -ContentType "application/json" -UseBasicParsing
 }
